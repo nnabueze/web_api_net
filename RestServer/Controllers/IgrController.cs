@@ -1,4 +1,5 @@
-﻿using RestServer.Models;
+﻿using Newtonsoft.Json;
+using RestServer.Models;
 using RestServer.Models.Repository;
 using System;
 using System.Collections;
@@ -7,13 +8,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Xml;
 
 namespace RestServer.Controllers
 {
     public class IgrController : ApiController
     {
         // GET: api/Igr
-        public ArrayList Get()
+        [HttpGet]
+        public ArrayList GetIgr()
         {
             IgrRepository pp = new IgrRepository();
             return pp.GetIgrs();
@@ -29,13 +32,14 @@ namespace RestServer.Controllers
         }
 
         // POST: api/Igr
-        public HttpResponseMessage Post([FromBody]Igr value)
+        [HttpPost]
+        public Object PostIgr(HttpRequestMessage request)
         {
-            IgrRepository pp = new IgrRepository();
-            long id = pp.saveIgr(value);
+                   var doc = new XmlDocument();
+                    doc.Load(request.Content.ReadAsStreamAsync().Result);
 
-            HttpResponseMessage reponse = Request.CreateResponse(HttpStatusCode.Created,"craeted");
-            return reponse;
+                    var obj = JsonConvert.SerializeXmlNode(doc);           
+                    return JsonConvert.DeserializeObject(obj);
         }
 
         // PUT: api/Igr/5
